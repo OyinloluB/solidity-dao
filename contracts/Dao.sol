@@ -24,9 +24,6 @@ contract Dao is Ownable {
     event Vote(uint256 submissionId);
     event Unvote(uint256 submissionId);
 
-    error voteAlreadyEnded();
-    error voteNotYetEnded();
-
     struct Submission {
         uint256 id;
         string name;
