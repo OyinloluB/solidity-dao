@@ -12,7 +12,7 @@ contract Token is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    uint256 public max_supply = 1000 * 10 ** 18;
+    uint256 public max_supply = 10;
 
     constructor() ERC721("Token", "MTK") {
         _mint(msg.sender, max_supply);

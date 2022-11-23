@@ -2,6 +2,9 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+import "hardhat/console.sol";
+
 import "./Token.sol";
 
 interface IToken {
@@ -24,7 +27,7 @@ contract Dao is Ownable {
     error voteAlreadyEnded();
     error voteNotYetEnded();
 
-     struct Submission {
+    struct Submission {
         uint256 id;
         string name;
         uint256 voteCount;
@@ -46,7 +49,10 @@ contract Dao is Ownable {
     }
 
     modifier tokenOwnerOnly() {
-        require(tokenContract.balanceOf(msg.sender) > 0, "You don't own any tokens");
+        require(
+            tokenContract.balanceOf(msg.sender) > 0,
+            "You don't own any tokens"
+        );
         _;
     }
 
@@ -58,10 +64,7 @@ contract Dao is Ownable {
         _;
     }
 
-    function addSubmission(string memory _name)
-        external
-        tokenOwnerOnly
-    {
+    function addSubmission(string memory _name) external tokenOwnerOnly {
         submissionCount++;
         Submission memory newSubmission = Submission(
             submissionCount,
@@ -69,6 +72,11 @@ contract Dao is Ownable {
             0,
             block.timestamp + 5 minutes
         );
+
+        submissionsArr.push(
+            Submission(submissionCount, _name, 0, block.timestamp + 5 minutes)
+        );
+
         submissions[submissionCount] = newSubmission;
 
         emit SubmissionCreated(_name);
@@ -82,12 +90,19 @@ contract Dao is Ownable {
         return submissions[_submissionId];
     }
 
+    function viewSubmissions()
+        external
+        view
+        returns (Submission[] memory)
+    {
+        return submissionsArr;
+    }
+
     function vote(uint256 _submissionId)
         external
         tokenOwnerOnly
         onlyActiveProposal(_submissionId)
     {
-        // Submission storage submission = submissions[_submissionId];
         uint256 numVotes = 0;
 
         if (voters[_submissionId] == false) {
